@@ -1,9 +1,3 @@
-/*
-  Arduino Pong receiver (full-buffer variant) with OLED victory message (fixed)
-  NOTA: no se modifica la lógica del sketch original, solo se añaden y sustituyen
-  comentarios por su traducción y explicaciones en español línea por línea.
-*/
-
 #include <U8g2lib.h>         // Librería U8g2 para manejar pantallas OLED
 #include <avr/pgmspace.h>    // Utilidades para almacenar datos en PROGMEM (memoria flash)
 
