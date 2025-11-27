@@ -1,7 +1,7 @@
 #include <U8g2lib.h>         // Librería U8g2 para manejar pantallas OLED
 #include <avr/pgmspace.h>    // Utilidades para almacenar datos en PROGMEM (memoria flash)
 
-// Constructor de la pantalla que funcionó en tus pruebas (no modificar)
+//Constructor del Display
 U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);
 
 // Pines empleados en la placa Arduino
