@@ -1,29 +1,30 @@
-# - Modo Pantalla: visualización y sonido en el PC (no se envían frames al Arduino).
-# - Modo OLED: se envían frames al Arduino; el Arduino dibuja y (opcionalmente) maneja el zumbador.
+# - Modo Pantalla: visualización y sonido en el PC (como modo pantalla en Switch).
+# - Modo OLED: se envían frames al Arduino (modo portátil en Switch).
 
+#Las librerías que usamos fueron:
 import pygame           # Biblioteca para gráficos y sonido en PC
 import sys              # Acceso a funciones del sistema (salir)
 import serial           # pyserial para comunicación con Arduino
-import time             # temporización y sleep
-import math             # funciones matemáticas (sin, sqrt, hypot, etc.)
+import time            
+import math             
 import io               # manejo de bytes en memoria (para generar WAV)
 import wave             # crear audio WAV en memoria
-import array            # arrays de enteros para samples de audio
-import random           # usado para variar la dirección vertical de la pelota
+import array            
+import random           
 
-# Inicializar pygame (recurso gráfico/sonoro)
+#Aquí inicia todo
 pygame.init()
 
-# Resolución de la ventana del juego (PC)
+# Resolución del campo de Batalla
 ANCHO, ALTO = 800, 600
 
-# Definición de colores como tuplas RGB
+# Todo esto para el menú:
 BLANCO = (255, 255, 255)
 NEGRO = (0, 0, 0)
 DORADO = (255, 215, 0)
 COLOR_BOX = (70, 170, 225)
 
-# Opciones visibles en el menú (etiqueta, valor RGB)
+
 OPCIONES_COLOR = [
     ("BLANCO", BLANCO),
     ("ROJO", (255, 0, 0)),
@@ -32,19 +33,19 @@ OPCIONES_COLOR = [
     ("AMARILLO", DORADO)
 ]
 
-# Opciones numéricas para velocidad (ahora usadas para la pelota)
+
 OPCIONES_VELOCIDAD = [4, 6, 8, 10, 12]
 
-# Opciones para puntos máximos a ganar
+
 OPCIONES_PUNTAJE_MAXIMO = [1, 3, 5, 7, 10]
 
-# Opciones de sonido (texto mostrado en menú)
+
 OPCIONES_SONIDO = ["Sí", "No"]
 
-# Opciones de pantalla (ahora en español)
+
 OPCIONES_PANTALLA = ["Pantalla", "OLED"]
 
-# Fuentes tipográficas para distintos tamaños del UI
+
 fuente_titulo   = pygame.font.SysFont("Arial Rounded MT Bold", 60)
 fuente_opcion   = pygame.font.SysFont("Arial", 38)
 fuente_valor    = pygame.font.SysFont("Arial", 34)
@@ -53,11 +54,9 @@ fuente_mensaje  = pygame.font.SysFont("Arial", 20)
 
 # Crear la ventana principal de pygame con la resolución ANCHOxALTO
 pantalla = pygame.display.set_mode((ANCHO, ALTO))
-
-# Título de la ventana (pestaña)
 pygame.display.set_caption('🍍 It\'s Ponguitime, S O B R E V I V E 🍍')
 
-# Intento de inicializar el mezclador de sonido de pygame (si está disponible)
+# Intento de inicializar el mezclador de sonido de pygame
 try:
     pygame.mixer.pre_init(frequency=44100, size=-16, channels=1)  # parámetros de audio
     pygame.mixer.init()  # inicializa subsistema audio
@@ -71,6 +70,7 @@ MELODY_DUR_MS = [140, 120, 115, 140, 120, 120, 300, 320]        # duraciones ms
 
 # ---------------------------------------------------------------------
 # Generar sonido: funciones para crear WAV en memoria desde un tono senoidal
+#Esto lo comentamos mucho porque es muy técnico, jeje.
 # ---------------------------------------------------------------------
 def generar_tono_wav_bytes(freq, duracion_s=0.08, sample_rate=44100, volumen=0.5):
     # número de muestras necesarias para la duración pedida
@@ -106,7 +106,7 @@ def crear_sonido_desde_tono(freq, duracion_s=0.08, volumen=0.5):
         except Exception:
             return None  # si falla, retornamos None
 
-# Precrear un sonido corto para colisiones (si hay audio)
+# El bip del golpazo de pelota contra paleta en PONGCITY
 BIP_COLISION = None
 try:
     if pygame.mixer.get_init() is not None:
@@ -114,7 +114,7 @@ try:
 except Exception:
     BIP_COLISION = None
 
-# Reproducir melodía de victoria en PC (bloqueante)
+# Reproducir melodía de victoria en PC
 def reproducir_melodia_pc():
     if pygame.mixer.get_init() is None:
         return  # sin mixer, salir
@@ -142,14 +142,14 @@ def fondo_degradado():
 
 def dibujar_juego(rect_izq, rect_der, rect_pelota, color_paleta, color_pelota, marcador_izq, marcador_der, puntos_para_ganar):
     fondo_degradado()
-    # paletas y pelota como elipses
+    # paletas y pelotas
     pygame.draw.ellipse(pantalla, color_paleta, rect_izq)
     pygame.draw.ellipse(pantalla, color_paleta, rect_der)
     pygame.draw.ellipse(pantalla, color_pelota, rect_pelota)
     # línea punteada central
     for y in range(0, ALTO, 14):
         pygame.draw.line(pantalla, BLANCO, (ANCHO//2, y), (ANCHO//2, y+7))
-    # marcadores y texto
+    # Cosas textosas
     texto_izq = fuente_opcion.render(str(marcador_izq), True, color_paleta)
     texto_der = fuente_opcion.render(str(marcador_der), True, color_paleta)
     texto_gana = fuente_info.render(f"Puntaje para ganar: {puntos_para_ganar}", True, DORADO)
@@ -164,7 +164,7 @@ def dibujar_juego(rect_izq, rect_der, rect_pelota, color_paleta, color_pelota, m
 # Comunicación con Arduino: leer pots y botones, enviar frame
 # ---------------------------------------------------------------------
 def leer_potenciometros_y_botones(ser):
-    # devuelve (pot1, pot2, btn1, btn2) si hay una línea disponible, sino (None, None, None, None)
+    # devuelve (pot1, pot2, btn1, btn2) si hay una línea disponible, si no, pus ya es (None, None, None, None)
     if ser is None:
         return None, None, None, None
     try:
@@ -180,7 +180,7 @@ def leer_potenciometros_y_botones(ser):
     return None, None, None, None
 
 def enviar_frame_oled(ser, lpaddle, rpaddle, bx, by, score_l, score_r):
-    # mapea valores del espacio PC (ANCHO x ALTO) al espacio OLED (0..127, 0..63)
+    # mapea valores del espacio PC (ANCHO x ALTO) al espacio OLED (0..127, 0..63), pq el Oled de Héctor es el de 128x64
     def mapa_int(val, inmin, inmax, outmin, outmax):
         if inmax == inmin:
             return outmin
@@ -188,7 +188,6 @@ def enviar_frame_oled(ser, lpaddle, rpaddle, bx, by, score_l, score_r):
         t = float(v - inmin) / float(inmax - inmin)
         return int(round(outmin + t * (outmax - outmin)))
     # NOTA: las variables lp_y, rp_y, b_x, b_y y score_l/score_r forman el paquete enviado;
-    # según tu instrucción, las dejamos con esos nombres para no alterar el protocolo.
     lp_y = mapa_int(lpaddle.centery, 0, ALTO, 0, 63)
     rp_y = mapa_int(rpaddle.centery, 0, ALTO, 0, 63)
     b_x  = mapa_int(bx, 0, ANCHO, 0, 127)
@@ -201,6 +200,7 @@ def enviar_frame_oled(ser, lpaddle, rpaddle, bx, by, score_l, score_r):
 
 # ---------------------------------------------------------------------
 # Colisiones y física: detección y reflexión elíptica
+# Puff, esto estuvo feo
 # ---------------------------------------------------------------------
 def colision_ovalo(rect_pelota, rect_paleta):
     # aproximación elíptica a colisión: normalizar distancia por semiejes
@@ -223,7 +223,7 @@ def reflejar_pelota_elipse(ball_rect, ellipse_rect, dx, dy, ball_radius=None):
     a = ellipse_rect.width/2.0; b = ellipse_rect.height/2.0
     r = (ball_rect.width/2.0) if ball_radius is None else float(ball_radius)
     vx = bx - ex; vy = by - ey
-    # protección: si el vector es casi cero, dar un vector no nulo
+    # protección: si el vector es casi cero, dar un vector no nulo. Inicialmente lo anterior debe jalar, pero por si las moscas
     if abs(vx) < 1e-6 and abs(vy) < 1e-6:
         vx = 0.0001; vy = 1.0
     denom = (vx*vx)/(a*a) + (vy*vy)/(b*b)
@@ -264,14 +264,12 @@ def reflejar_pelota_elipse(ball_rect, ellipse_rect, dx, dy, ball_radius=None):
 # Bucle principal de la partida
 # ---------------------------------------------------------------------
 def ejecutar_partida(ser, color_paleta, color_pelota, velocidad, puntaje_ganador, sonido, jugar_en_arduino=False):
-    # limpiar buffer serial si lo hay
     if ser is not None:
         try:
             ser.reset_input_buffer()
         except Exception:
             pass
 
-    # avisar al Arduino si debe habilitar sonido (S1) o deshabilitar (S0)
     if jugar_en_arduino and ser is not None:
         try:
             if sonido:
@@ -286,18 +284,15 @@ def ejecutar_partida(ser, color_paleta, color_pelota, velocidad, puntaje_ganador
         except Exception:
             pass
 
-    # tamaños y rects iniciales (posiciones iniciales)
     ANCHO_PALETA, ALTO_PALETA = 30, 120
     ANCHO_PELOTA, ALTO_PELOTA = 30, 30
     rect_izq = pygame.Rect(20, (ALTO - ALTO_PALETA)//2, ANCHO_PALETA, ALTO_PALETA)
     rect_der = pygame.Rect(ANCHO - 20 - ANCHO_PALETA, (ALTO - ALTO_PALETA)//2, ANCHO_PALETA, ALTO_PALETA)
     rect_pelota = pygame.Rect((ANCHO - ANCHO_PELOTA)//2, (ALTO - ANCHO_PELOTA)//2, ANCHO_PELOTA, ALTO_PELOTA)
 
-    # contadores de puntaje
     marca_izq = marca_der = 0
 
     # velocidad inicial de la pelota: DX horizontal, DY vertical (ambos escala 'velocidad')
-    # IMPORTANTE: en esta versión NO se reescala la norma tras rebotes => la magnitud puede cambiar
     dx = float(velocidad)
     dy = float(velocidad) * ( -1 if random.random() < 0.5 else 1 )
 
@@ -320,10 +315,10 @@ def ejecutar_partida(ser, color_paleta, color_pelota, velocidad, puntaje_ganador
     SEND_INTERVAL = 1.0 / 60.0
     last_send = time.time()
 
-    # velocidad por teclado (no afectada por la opción 'velocidad' en esta versión)
+    # velocidad por teclado (Esto no nos es útil, pero como dicen, si jala no le muevas)
     kb_speed = OPCIONES_VELOCIDAD[1]  # default 6
 
-    # función que muestra la pantalla de victoria local en PC (bloqueante breve)
+    # función que muestra la pantalla de victoria local en PC
     def mostrar_pantalla_victoria_pc(texto):
         end_t = time.time() + 2.5
         while time.time() < end_t:
@@ -353,7 +348,6 @@ def ejecutar_partida(ser, color_paleta, color_pelota, velocidad, puntaje_ganador
                     corriendo = False
                     break
 
-        # Leer potenciómetros y botones desde Arduino (si hay serial)
         r_pot1, r_pot2, r_btn1, r_btn2 = leer_potenciometros_y_botones(ser)
 
         # Si llegaron lecturas de potenciómetros, suavizarlas y actualizar timestamp
@@ -365,7 +359,8 @@ def ejecutar_partida(ser, color_paleta, color_pelota, velocidad, puntaje_ganador
             last_pot_time = time.time()
 
         now = time.time()
-        # Debounce para botón remoto (si existe)
+
+        # Debounce para botón remoto (si existe). (Esto nunca existió jaja, quitamos el botón al final)
         if r_btn1 is not None:
             if r_btn1 != btn1_candidate:
                 btn1_candidate = r_btn1
@@ -407,7 +402,7 @@ def ejecutar_partida(ser, color_paleta, color_pelota, velocidad, puntaje_ganador
                 colision_rebote = True
                 # NOTA: en esta versión NO se reescala la magnitud -> norma puede cambiar aquí
 
-            # Colisión con paleta izquierda: comprobar aproximación y reflexionar
+            # Colisión con paleta izquierda: comprobar aproximación y reflejar
             if colision_ovalo(rect_pelota, rect_izq):
                 bx, by = rect_pelota.center
                 ex, ey = rect_izq.center
@@ -470,14 +465,12 @@ def ejecutar_partida(ser, color_paleta, color_pelota, velocidad, puntaje_ganador
         if ganador is not None:
             if jugar_en_arduino and ser is not None:
                 try:
-                    # enviar el frame final con puntajes actualizados antes de orden de victoria
                     enviar_frame_oled(ser, rect_izq, rect_der, rect_pelota.centerx, rect_pelota.centery, marca_izq, marca_der)
                     try:
                         ser.flush()   # intentar vaciar buffer de salida
                     except Exception:
                         pass
-                    time.sleep(0.06)   # breve espera para transmisión (ajustable)
-                    # enviar comando de victoria; Arduino mostrará overlay y (si está habilitado) melodía
+                    time.sleep(0.06)   
                     ser.write(b'W\n')
                     try:
                         ser.flush()
@@ -516,7 +509,6 @@ def ejecutar_partida(ser, color_paleta, color_pelota, velocidad, puntaje_ganador
         if not jugar_en_arduino:
             dibujar_juego(rect_izq, rect_der, rect_pelota, color_paleta, color_pelota, marca_izq, marca_der, puntaje_ganador)
         else:
-            # en modo OLED, mostrar mensaje indicativo localmente (la pantalla principal la maneja Arduino)
             pantalla.fill((0,0,0))
             info = fuente_info.render("Jugando en OLED (pantalla y sonido en Arduino)", True, BLANCO)
             pantalla.blit(info, (ANCHO//2 - info.get_width()//2, ALTO//2 - info.get_height()//2))
@@ -524,7 +516,6 @@ def ejecutar_partida(ser, color_paleta, color_pelota, velocidad, puntaje_ganador
 
         reloj.tick(60)  # limitar a ~60 FPS
 
-    # Antes de salir de la función: si usamos OLED, reenviar S1 (activar sonido) para restaurar estado por defecto
     # Esto es opcional: sirve para que si el usuario salió con sonido desactivado no deje Arduino en silencio permanente.
     if jugar_en_arduino and ser is not None:
         try:
@@ -600,7 +591,6 @@ def menu_con_pots(ser):
                 pygame.quit(); sys.exit()
             if evento.type == pygame.KEYDOWN and evento.key == pygame.K_RETURN:
                 if indice_menu == 6:
-                    # Devolver configuración elegida: pantalla, color paleta, color pelota, velocidad, puntaje, sonido(bool)
                     return (OPCIONES_PANTALLA[idx_pantalla],
                             OPCIONES_COLOR[idx_paleta][1],
                             OPCIONES_COLOR[idx_pelota][1],
@@ -669,7 +659,6 @@ def principal():
         # Mostrar menú y obtener configuración
         modo_pantalla, color_paleta, color_pelota, velocidad, puntaje_ganador, sonido = menu_con_pots(ser)
         jugar_en_arduino = (modo_pantalla == "OLED") and (ser is not None)
-        # Ejecutar la partida con la configuración elegida
         ejecutar_partida(ser, color_paleta, color_pelota, velocidad, puntaje_ganador, sonido, jugar_en_arduino=jugar_en_arduino)
     except KeyboardInterrupt:
         print("Interrumpido por usuario.")
