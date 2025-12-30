@@ -15,7 +15,7 @@ This work presents the design, construction, and programming of the "PongStation
 
 This project centers on a complex system integrating analog and digital electronic components, including sliding potentiometers, an SH1106 I2C OLED display, and a passive buzzer. The console is managed via a serial communication protocol optimized for real-time operation with no perceptible latency, ensuring gameplay is as fluid as attainable with an Arduino UNO.
 
-Unlike traditional implementations, this project introduces a custom physics engine that replaces simple rectangular collisions with **elliptical paddles**, applying vector calculus to determine velocity reflection. The results demonstrate a robust system capable of operating in two game modes—*Monitor* and *OLED*—covering both visualization and sound. This validates the successful integration of circuit theory, data acquisition, and computational mathematical modeling, culminating in the application of all knowledge acquired in the Electronics Laboratory.
+Unlike traditional implementations, this project introduces a custom physics engine that replaces simple rectangular collisions with **elliptical paddles**, applying vector calculus to determine velocity reflection. The results demonstrate a robust system capable of operating in two game modes—*Monitor* and *OLED*—covering both visualization and sound.
 
 ## Key Features
 * **Hybrid Architecture:** Arduino handles input/output (ADC/DAC) while Python manages the game logic and physics engine.
