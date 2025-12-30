@@ -36,6 +36,12 @@ Unlike traditional implementations, this project introduces a custom physics eng
 ## Installation & Usage
 
 1.  **Hardware Setup:**
+
+The setup is shown in the following diagram.
+<div align="center">
+ <img width="708" height="618" alt="image" src="https://github.com/user-attachments/assets/b0c8de9a-7d17-45a4-9797-c07871ea0d10" />
+</div>
+
 2.  **Firmware:**
     * Upload the `pong_firmware.ino` sketch to the Arduino Uno.
 
