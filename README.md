@@ -3,7 +3,9 @@
 
 **PongStation** is a hardware-software reimplementation of the classic 1972 *Pong* video game, built effectively from scratch to demonstrate the integration of analog electronics, real-time serial communication, and vector physics.
 
-<img width="616" height="448" alt="image" src="https://github.com/user-attachments/assets/db1bfff3-eb99-4a2c-a2fc-10a6ec506a7b" />
+<div align="center">
+  <img width="616" height="448" alt="image" src="https://github.com/user-attachments/assets/db1bfff3-eb99-4a2c-a2fc-10a6ec506a7b" />
+</div>
 
 ## Author:
 
