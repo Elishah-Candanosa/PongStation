@@ -47,6 +47,7 @@ The setup is shown in the following diagram.
 
 3.  **Software:**
     * Run the Python Script on your Laptop. **Be aware that a UNIX environment is expected, if your device has Windows, it might still work changing the port in the Python Script.**
+    * The game is played through the sliders and the button, thus, the Arduino Board, with the sketch loaded already, **must be connected to your laptop while the software is running**.
 
 
 ---
