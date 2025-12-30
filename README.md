@@ -1,8 +1,6 @@
 # PongStation: Hybrid Arduino-Python Console
 
-## Author:
-
-* **Elishah Candanosa**
+* **Author:** Elishah Candanosa
   
 
 **PongStation** is a hardware-software reimplementation of the classic 1972 *Pong* video game, built effectively from scratch to demonstrate the integration of analog electronics, real-time serial communication, and vector physics.
