@@ -1,7 +1,14 @@
 # PongStation: Hybrid Arduino-Python Console
 
+
 **PongStation** is a hardware-software reimplementation of the classic 1972 *Pong* video game, built effectively from scratch to demonstrate the integration of analog electronics, real-time serial communication, and vector physics.
 
+<img width="316" height="248" alt="image" src="https://github.com/user-attachments/assets/db1bfff3-eb99-4a2c-a2fc-10a6ec506a7b" />
+
+## Author:
+
+* **Elishah Candanosa**
+  
 ## Abstract
 This work presents the design, construction, and programming of the "PongStation," a reimplementation of the classic 1972 Pong video game using a hybrid architecture combining an Arduino Uno microcontroller and a Python execution environment. Notably, it offers the flexibility to play on either an **I2C OLED Display** or a **Laptop screen**.
 
@@ -33,9 +40,7 @@ Unlike traditional implementations, this project introduces a custom physics eng
 
 3.  **Software:**
     * Run the Python Script on your Laptop. **Be aware that a UNIX environment is expected, if your device has Windows, it might still work changing the port in the Python Script.**
-## Author:
 
-* **Elishah Candanosa**
 
 ---
 
