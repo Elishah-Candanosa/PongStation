@@ -1,5 +1,5 @@
 # PongStation: 
-## *Hybrid Arduino-Python Console*
+### *Hybrid Arduino-Python Console*
 
 * **Author:** Elishah Candanosa
   
